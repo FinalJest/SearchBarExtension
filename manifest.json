@@ -1,0 +1,9 @@
+{
+    "name": "Search On New Tab",
+    "version": "1.0",
+    "description": "Search Bar with Suggestions",
+    "chrome_url_overrides": {
+      "newtab": "dist/index.html"
+    },
+    "manifest_version": 2
+}

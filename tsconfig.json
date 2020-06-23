@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "esModuleInterop": true,
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "jsx": "react",
+        "module": "ES2015",
+        "lib": ["ES2015", "DOM"],
+        "target": "ES5",
+        "moduleResolution": "Node"
+    },
+    "include": [
+        "**/*"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
