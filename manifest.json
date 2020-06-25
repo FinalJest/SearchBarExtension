@@ -5,5 +5,8 @@
     "chrome_url_overrides": {
       "newtab": "dist/index.html"
     },
+    "permissions": [
+      "*://*.mail.ru/"
+    ],
     "manifest_version": 2
 }
