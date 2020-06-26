@@ -14,6 +14,10 @@ const SearchInput = styled.input`
     flex: 1;
 `;
 
+const SearchButton = styled.button`
+
+`;
+
 interface ISearchSuggestItem {
     value: string
 }
@@ -62,6 +66,9 @@ export default function SearchBar(): React.ReactElement {
         if (e.key === 'Enter') {
             openSearchTab(currentValue.value);
         }
+    }, [currentValue]);
+    const onSearchButtonClick = useCallback(() => {
+        openSearchTab(currentValue.value);
     }, [currentValue]);
 
     const handleStateChange = useCallback((changes: StateChangeOptions<any>) => {
@@ -112,13 +119,13 @@ export default function SearchBar(): React.ReactElement {
             onStateChange={handleStateChange}
         >
             {({
-            getInputProps,
-            getItemProps,
-            getMenuProps,
-            isOpen,
-            highlightedIndex,
-            selectedItem,
-            getRootProps,
+                getInputProps,
+                getItemProps,
+                getMenuProps,
+                isOpen,
+                highlightedIndex,
+                selectedItem,
+                getRootProps,
             }) => (
                 <Wrapper {...getRootProps()}>
                     <InputBlock>
@@ -131,6 +138,7 @@ export default function SearchBar(): React.ReactElement {
                                 placeholder: 'Enter Search Query'
                             }) as IntrinsicInput}
                         />
+                        <SearchButton onClick={onSearchButtonClick}>Search</SearchButton>
                     </InputBlock>
                     <ul {...getMenuProps()}>
                     {isOpen
