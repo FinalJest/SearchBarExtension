@@ -53,7 +53,7 @@ interface ISuggestApiResponse {
 type IntrinsicInput = JSX.IntrinsicElements['input'] & { ref?: Ref<HTMLInputElement> };
 
 export default function SearchBar(): React.ReactElement {
-    const [items, setItems] = useState([]);
+    const [items, setItems] = useState<ISearchSuggestItem[]>([]);
     const [currentValue, setCurrentValue] = useState<ISearchSuggestItem>(null);
     const inputElement = useRef<HTMLInputElement>(null);
 
@@ -96,22 +96,6 @@ export default function SearchBar(): React.ReactElement {
         }
     }, []);
 
-    const onInputChange = useCallback(() => {
-        const inputData = inputElement.current ? inputElement.current.value : null;
-
-            if (inputData) {
-                fetch(`https://suggests.go.mail.ru/sg_ntp?ush=1&get_nvg=1&q=${inputData}`)
-                    .then((response) => response.json())
-                    .then((data: ISuggestApiResponse) => {
-                        const newItems = data.items.map((item) => ({ value: item.text }));
-
-                        setItems(newItems);
-                    });
-            } else {
-                setItems([]);
-            }
-    }, []);
-
     return (
         <Downshift
             selectedItem={currentValue}
@@ -131,7 +115,6 @@ export default function SearchBar(): React.ReactElement {
                     <InputBlock>
                         <SearchInput 
                             {...getInputProps({
-                                onChange: onInputChange,
                                 onKeyDown: onInputKeyDown,
                                 ref: inputElement,
                                 isOpen,
