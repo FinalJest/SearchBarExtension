@@ -1,34 +1,14 @@
-import React, { useState, useCallback, useRef, Ref } from 'react';
+import React, { useState, useCallback, Ref } from 'react';
 import Downshift, { StateChangeOptions } from 'downshift';
-import styled from 'styled-components';
 
-const Wrapper = styled.div`
-    padding: 20px;
-`;
-
-const InputBlock = styled.div`
-    display: flex;
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1), 0px 0px 4px rgba(0, 0, 0, 0.05);
-    border-radius: 4px;
-    padding: 6px;
-    background-color: white;
-    height: 52px;
-    box-sizing: border-box;
-`;
-
-const SearchInput = styled.input`
-    flex: 1;
-    border: none;
-    outline: none;
-`;
-
-const SearchButton = styled.button`
-    width: 126px;
-    background: linear-gradient(225.1deg, #458EFF 0%, #6B3DFF 100%);
-    border-radius: 2px;
-    color: white;
-    border: none;
-`;
+import {
+    Wrapper,
+    InputBlock,
+    SearchInput,
+    SearchButton,
+    ClearInputButton,
+    SuggestItem
+} from './styles';
 
 interface ISearchSuggestItem {
     value: string
@@ -64,9 +44,13 @@ interface ISuggestApiResponse {
 // Нужно чтобы работали тайпинги между styled-components и downshift
 type IntrinsicInput = JSX.IntrinsicElements['input'] & { ref?: Ref<HTMLInputElement> };
 
+function getSearchUrl(query: string): string {
+    return `https://go.mail.ru/search?q=${query}`;
+}
+
 function openSearchTab(value: string): void {
     chrome.tabs.update({ 
-        url: `https://go.mail.ru/search?q=${value}`
+        url: getSearchUrl(value)
     });
 };
 
@@ -77,7 +61,6 @@ function searchSuggestItemToString(item: ISearchSuggestItem): string {
 export default function SearchBar(): React.ReactElement {
     const [items, setItems] = useState<ISearchSuggestItem[]>([]);
     const [currentValue, setCurrentValue] = useState<ISearchSuggestItem>(null);
-    const inputElement = useRef<HTMLInputElement>(null);
 
     const onInputKeyDown = useCallback((e: KeyboardEvent): void => {
         if (e.key === 'Enter') {
@@ -105,11 +88,6 @@ export default function SearchBar(): React.ReactElement {
 
                 break;
             }
-            case Downshift.stateChangeTypes.keyDownEnter:
-            case Downshift.stateChangeTypes.clickItem:
-                openSearchTab(changes.selectedItem.value);
-
-                break;
             case Downshift.stateChangeTypes.itemMouseEnter:
             case Downshift.stateChangeTypes.keyDownArrowUp:
             case Downshift.stateChangeTypes.keyDownArrowDown:
@@ -124,6 +102,7 @@ export default function SearchBar(): React.ReactElement {
             selectedItem={currentValue}
             itemToString={searchSuggestItemToString}
             onStateChange={handleStateChange}
+            isOpen={true}
         >
             {({
                 getInputProps,
@@ -133,44 +112,47 @@ export default function SearchBar(): React.ReactElement {
                 highlightedIndex,
                 selectedItem,
                 getRootProps,
+                clearSelection
             }) => (
                 <Wrapper {...getRootProps()}>
                     <InputBlock>
                         <SearchInput 
                             {...getInputProps({
                                 onKeyDown: onInputKeyDown,
-                                ref: inputElement,
-                                isOpen,
                                 placeholder: 'Enter Search Query'
                             }) as IntrinsicInput}
                         />
+                        <ClearInputButton
+                            onClick={() => clearSelection()}
+                        >
+                            <img src="../../images/clear.svg" />
+                        </ClearInputButton>
                         <SearchButton 
                             onClick={onSearchButtonClick}
                         >
                             Search
                         </SearchButton>
                     </InputBlock>
-                    <ul {...getMenuProps()}>
+                    <div {...getMenuProps()}>
                     {isOpen
                         ? items
                             .map((item, index) => (
-                            <li
+                            <SuggestItem
                                 {...getItemProps({
                                 key: item.value,
                                 index,
                                 item,
+                                href: getSearchUrl(item.value),
                                 style: {
-                                    backgroundColor:
-                                    highlightedIndex === index ? 'lightgray' : 'white',
-                                    fontWeight: selectedItem === item ? 'bold' : 'normal',
-                                },
+                                    backgroundColor: highlightedIndex === index ? 'lightblue' : 'white' 
+                                }
                                 })}
                             >
                                 {item.value}
-                            </li>
+                            </SuggestItem>
                             ))
                         : null}
-                    </ul>
+                    </div>
                 </Wrapper>
             )}
         </Downshift>
