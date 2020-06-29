@@ -5,7 +5,7 @@ const textSize = '17px';
 const sidePadding = '19px';
 
 const Wrapper = styled.div`
-    padding: 20px;
+    margin: 20px;
     color: ${textColor};
 `;
 
@@ -48,23 +48,19 @@ const SuggestMenu = styled.div`
     margin-top: 8px;
     background: white;
     border-radius: 4px;
+
+    &:not(:empty) {
+        padding: 8px 0;
+    }
 `;
 
-const SuggestItem = styled.a`
+const SuggestItem = styled.div`
     display: flex;
     color: ${textColor};
-    text-decoration: none;
     font-size: ${textSize};
     padding: 8px ${sidePadding};
+    cursor: pointer;
     background: ${(props: { selected: boolean }) => props.selected ? '#EBEEF1' : 'transparent'}
-
-    &:first-child {
-        margin-top: 8px;
-    }
-
-    &:last-child {
-        margin-botton: 8px;
-    }
 `;
 
 export {

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, Ref } from 'react';
+import React, { useState, useCallback, Ref, SyntheticEvent } from 'react';
 import Downshift, { StateChangeOptions } from 'downshift';
 
 import {
@@ -71,6 +71,9 @@ export default function SearchBar(): React.ReactElement {
     const onSearchButtonClick = useCallback((): void => {
         openSearchTab(currentValue.value);
     }, [currentValue]);
+    const getOnItemClickHandler = (item: ISearchSuggestItem) => () => {
+        openSearchTab(item.value);
+    }
 
     const handleStateChange = useCallback((changes: StateChangeOptions<any>): void => {
         switch (changes.type) {
@@ -142,7 +145,7 @@ export default function SearchBar(): React.ReactElement {
                                 index,
                                 selected: highlightedIndex === index,
                                 item,
-                                href: getSearchUrl(item.value)
+                                onClick: getOnItemClickHandler(item)
                                 })}
                             >
                                 {item.value}
