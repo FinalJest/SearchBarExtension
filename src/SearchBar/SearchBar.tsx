@@ -1,13 +1,17 @@
-import React, { useState, useCallback, Ref, SyntheticEvent, RefObject, useRef, useMemo } from 'react';
-import Downshift, { DownshiftState, StateChangeOptions } from 'downshift';
+import React, { useState, useCallback, useRef, Ref } from 'react';
+import Downshift, { StateChangeOptions } from 'downshift';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
-    margin: 20px;
+    padding: 20px;
 `;
 
 const InputBlock = styled.div`
     display: flex;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1), 0px 0px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    padding: 6px;
+    background-color: white;
 `;
 
 const SearchInput = styled.input`
@@ -52,26 +56,31 @@ interface ISuggestApiResponse {
 // Нужно чтобы работали тайпинги между styled-components и downshift
 type IntrinsicInput = JSX.IntrinsicElements['input'] & { ref?: Ref<HTMLInputElement> };
 
+function openSearchTab(value: string): void {
+    chrome.tabs.update({ 
+        url: `https://go.mail.ru/search?q=${value}`
+    });
+};
+
+function searchSuggestItemToString(item: ISearchSuggestItem): string {
+    return item ? item.value : '';
+}
+
 export default function SearchBar(): React.ReactElement {
     const [items, setItems] = useState<ISearchSuggestItem[]>([]);
     const [currentValue, setCurrentValue] = useState<ISearchSuggestItem>(null);
     const inputElement = useRef<HTMLInputElement>(null);
 
-    const openSearchTab = useCallback((value: string) => {
-        chrome.tabs.update({ 
-            url: `https://go.mail.ru/search?q=${value}`
-        });
-    }, [currentValue]);
-    const onInputKeyDown = useCallback((e: KeyboardEvent) => {
+    const onInputKeyDown = useCallback((e: KeyboardEvent): void => {
         if (e.key === 'Enter') {
             openSearchTab(currentValue.value);
         }
     }, [currentValue]);
-    const onSearchButtonClick = useCallback(() => {
+    const onSearchButtonClick = useCallback((): void => {
         openSearchTab(currentValue.value);
     }, [currentValue]);
 
-    const handleStateChange = useCallback((changes: StateChangeOptions<any>) => {
+    const handleStateChange = useCallback((changes: StateChangeOptions<any>): void => {
         switch (changes.type) {
             case Downshift.stateChangeTypes.changeInput: {
                 setCurrentValue({ value: changes.inputValue });
@@ -86,20 +95,26 @@ export default function SearchBar(): React.ReactElement {
                     setItems([]);
                 }
 
-                return;
+                break;
             }
             case Downshift.stateChangeTypes.keyDownEnter:
             case Downshift.stateChangeTypes.clickItem:
                 openSearchTab(changes.selectedItem.value);
 
-                return;
+                break;
+            case Downshift.stateChangeTypes.itemMouseEnter:
+            case Downshift.stateChangeTypes.keyDownArrowUp:
+            case Downshift.stateChangeTypes.keyDownArrowDown:
+                setCurrentValue(items[changes.highlightedIndex]);
+
+                break;
         }
-    }, []);
+    }, [items]);
 
     return (
         <Downshift
             selectedItem={currentValue}
-            itemToString={item => (item ? item.value : '')}
+            itemToString={searchSuggestItemToString}
             onStateChange={handleStateChange}
         >
             {({
@@ -121,7 +136,11 @@ export default function SearchBar(): React.ReactElement {
                                 placeholder: 'Enter Search Query'
                             }) as IntrinsicInput}
                         />
-                        <SearchButton onClick={onSearchButtonClick}>Search</SearchButton>
+                        <SearchButton 
+                            onClick={onSearchButtonClick}
+                        >
+                            Search
+                        </SearchButton>
                     </InputBlock>
                     <ul {...getMenuProps()}>
                     {isOpen
