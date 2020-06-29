@@ -12,14 +12,22 @@ const InputBlock = styled.div`
     border-radius: 4px;
     padding: 6px;
     background-color: white;
+    height: 52px;
+    box-sizing: border-box;
 `;
 
 const SearchInput = styled.input`
     flex: 1;
+    border: none;
+    outline: none;
 `;
 
 const SearchButton = styled.button`
-
+    width: 126px;
+    background: linear-gradient(225.1deg, #458EFF 0%, #6B3DFF 100%);
+    border-radius: 2px;
+    color: white;
+    border: none;
 `;
 
 interface ISearchSuggestItem {
