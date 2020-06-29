@@ -7,6 +7,7 @@ import {
     SearchInput,
     SearchButton,
     ClearInputButton,
+    SuggestMenu,
     SuggestItem
 } from './styles';
 
@@ -102,7 +103,6 @@ export default function SearchBar(): React.ReactElement {
             selectedItem={currentValue}
             itemToString={searchSuggestItemToString}
             onStateChange={handleStateChange}
-            isOpen={true}
         >
             {({
                 getInputProps,
@@ -110,7 +110,6 @@ export default function SearchBar(): React.ReactElement {
                 getMenuProps,
                 isOpen,
                 highlightedIndex,
-                selectedItem,
                 getRootProps,
                 clearSelection
             }) => (
@@ -133,7 +132,7 @@ export default function SearchBar(): React.ReactElement {
                             Search
                         </SearchButton>
                     </InputBlock>
-                    <div {...getMenuProps()}>
+                    <SuggestMenu {...getMenuProps()}>
                     {isOpen
                         ? items
                             .map((item, index) => (
@@ -141,18 +140,16 @@ export default function SearchBar(): React.ReactElement {
                                 {...getItemProps({
                                 key: item.value,
                                 index,
+                                selected: highlightedIndex === index,
                                 item,
-                                href: getSearchUrl(item.value),
-                                style: {
-                                    backgroundColor: highlightedIndex === index ? 'lightblue' : 'white' 
-                                }
+                                href: getSearchUrl(item.value)
                                 })}
                             >
                                 {item.value}
                             </SuggestItem>
                             ))
                         : null}
-                    </div>
+                    </SuggestMenu>
                 </Wrapper>
             )}
         </Downshift>
